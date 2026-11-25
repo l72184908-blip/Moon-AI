@@ -24,15 +24,11 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Unzip project
-        run: unzip -o *.zip
-
       - name: Build debug APK
-        working-directory: moon-ai-android
         run: gradle assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: moon-ai-apk
-          path: moon-ai-android/app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
