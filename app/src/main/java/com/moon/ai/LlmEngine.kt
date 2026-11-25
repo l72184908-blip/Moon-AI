@@ -2,6 +2,7 @@ package com.moon.ai
 
 import android.content.Context
 import com.google.ai.edge.litertlm.Backend
+import com.google.ai.edge.litertlm.Content
 import com.google.ai.edge.litertlm.Contents
 import com.google.ai.edge.litertlm.Conversation
 import com.google.ai.edge.litertlm.ConversationConfig
@@ -30,13 +31,15 @@ class LlmEngine(private val context: Context) {
 
     val isReady: Boolean get() = engine != null
 
+    // NOTE: litertlm 0.10.2 has no maxOutputToken on ConversationConfig,
+    // so replies are not capped at 1024 tokens in v1 — the model stops
+    // on its own. Verified against the 0.10.2 AAR (javap).
     private fun buildConversationConfig() = ConversationConfig(
         systemInstruction = Contents.of(
             "You are Moon AI, a helpful offline assistant. " +
                 "Answer clearly and concisely."
         ),
-        samplerConfig = SamplerConfig(topK = 40, topP = 0.95, temperature = 0.7),
-        maxOutputToken = 1024
+        samplerConfig = SamplerConfig(topK = 40, topP = 0.95, temperature = 0.7)
     )
 
     /** Loads the model. Slow (seconds) — always call off the main thread. */
@@ -56,8 +59,15 @@ class LlmEngine(private val context: Context) {
     /** Streams the reply as text chunks (one Flow emission per chunk). */
     fun sendStreaming(prompt: String): Flow<String> = flow {
         val conv = conversation ?: throw IllegalStateException("Engine is not initialized")
-        conv.sendMessageAsync(prompt).collect { message ->
-            val text = message.text
+        // Pass the extraContext map explicitly: in 0.10.2 there is also a
+        // callback-based sendMessageAsync(String, MessageCallback, Map),
+        // so a bare sendMessageAsync(prompt) is ambiguous. (String, Map)
+        // selects the Flow overload. A Message carries Contents, whose
+        // list holds Content.Text parts — join them for the chunk text.
+        conv.sendMessageAsync(prompt, emptyMap<String, Any>()).collect { message ->
+            val text = message.contents.contents
+                .filterIsInstance<Content.Text>()
+                .joinToString("") { it.text }
             if (text.isNotEmpty()) emit(text)
         }
     }.flowOn(Dispatchers.Default)
