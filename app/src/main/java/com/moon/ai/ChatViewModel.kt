@@ -3,17 +3,22 @@ package com.moon.ai
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import java.io.FileOutputStream
+import java.io.IOException
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
-    enum class ModelStatus { NOT_DOWNLOADED, DOWNLOADING, LOADING, READY, ERROR }
+    enum class ModelStatus { NOT_DOWNLOADED, DOWNLOADING, SETTING_UP, LOADING, READY, ERROR }
 
     data class UiState(
         val status: ModelStatus = ModelStatus.NOT_DOWNLOADED,
@@ -33,6 +38,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private val engine = LlmEngine(application)
     private val downloader = ModelDownloader()
     private var downloadJob: Job? = null
+    private var setupJob: Job? = null
 
     init {
         refreshModelState()
@@ -49,7 +55,14 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             }
         } else {
             if (engine.isReady) engine.close()
-            if (_uiState.value.status != ModelStatus.DOWNLOADING) {
+            val status = _uiState.value.status
+            if (status == ModelStatus.DOWNLOADING || status == ModelStatus.SETTING_UP) return
+            // The model ships inside the APK: copy it out on first
+            // launch (fast, offline, no token). Only if the asset is
+            // missing do we fall back to the download button flow.
+            if (hasBundledModel(app)) {
+                startBundledSetup()
+            } else {
                 _uiState.update {
                     it.copy(
                         status = ModelStatus.NOT_DOWNLOADED,
@@ -57,6 +70,64 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         errorMessage = null
                     )
                 }
+            }
+        }
+    }
+
+    /** True when the APK carries the model file in its assets. */
+    private fun hasBundledModel(app: Application): Boolean {
+        return try {
+            app.assets.open(ModelManager.BUNDLED_ASSET_PATH).close()
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    /** Copies the bundled model from assets to internal storage. */
+    private fun startBundledSetup() {
+        val app = getApplication<Application>()
+        if (_uiState.value.status == ModelStatus.SETTING_UP) return
+        _uiState.update {
+            it.copy(status = ModelStatus.SETTING_UP, downloadProgress = 0, errorMessage = null)
+        }
+        setupJob = viewModelScope.launch {
+            try {
+                val file = ModelManager.modelFile(app)
+                withContext(Dispatchers.IO) {
+                    file.parentFile?.mkdirs()
+                    app.assets.open(ModelManager.BUNDLED_ASSET_PATH).use { input ->
+                        FileOutputStream(file).use { output ->
+                            val buffer = ByteArray(1024 * 1024)
+                            var copied = 0L
+                            var lastReport = System.currentTimeMillis()
+                            var read: Int
+                            while (input.read(buffer).also { read = it } != -1) {
+                                ensureActive()
+                                output.write(buffer, 0, read)
+                                copied += read
+                                val now = System.currentTimeMillis()
+                                if (now - lastReport > 200) {
+                                    lastReport = now
+                                    val pct =
+                                        ((copied * 100) / ModelManager.EXPECTED_SIZE_BYTES).toInt()
+                                    _uiState.update { it.copy(downloadProgress = pct) }
+                                }
+                            }
+                        }
+                    }
+                    if (file.length() != ModelManager.EXPECTED_SIZE_BYTES) {
+                        throw IOException(
+                            "Setup incomplete: ${file.length()} of " +
+                                "${ModelManager.EXPECTED_SIZE_BYTES} bytes"
+                        )
+                    }
+                }
+                _uiState.update { it.copy(downloadProgress = 100) }
+                loadEngine()
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                _uiState.update { it.copy(status = ModelStatus.ERROR, errorMessage = e.message) }
             }
         }
     }
@@ -182,6 +253,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     override fun onCleared() {
         downloadJob?.cancel()
+        setupJob?.cancel()
         engine.close()
         super.onCleared()
     }

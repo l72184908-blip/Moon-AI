@@ -29,6 +29,17 @@ object ModelManager {
     const val EXPECTED_SHA256 =
         "1325ae366d31950f137c9c357b9fa89448b176d76998180c08ceaca78bba98be"
 
+    /**
+     * The model file bundled inside the APK (assets/models/…). The
+     * GitHub Actions workflow downloads it from a public mirror at
+     * build time — it is NOT committed to the repo. On first launch
+     * the app copies it to internal storage, so the app is ready to
+     * use with no download, token or license step. If the asset is
+     * missing (a build without the workflow step), the app falls
+     * back to the download flow using MODEL_URL.
+     */
+    const val BUNDLED_ASSET_PATH = "models/gemma3-1b-it-int4.litertlm"
+
     fun modelFile(context: Context): File =
         File(File(context.filesDir, "models"), MODEL_FILE_NAME)
 

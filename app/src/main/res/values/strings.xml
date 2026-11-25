@@ -7,6 +7,7 @@
     <string name="settings">Settings</string>
     <string name="status_not_downloaded">Model not downloaded</string>
     <string name="status_downloading">Downloading model… %1$d%%</string>
+    <string name="status_setting_up">Setting up Moon AI… %1$d%%</string>
     <string name="status_loading">Loading model…</string>
     <string name="status_ready">Model ready — fully offline</string>
     <string name="status_error">Something went wrong: %1$s</string>

@@ -24,6 +24,18 @@ jobs:
         with:
           gradle-version: '8.7'
 
+      - name: Download bundled model
+        # The model ships INSIDE the APK so the app is ready to use
+        # with no download, token or license step. Fetched from a
+        # public mirror (no auth needed) and verified by SHA-256 —
+        # byte-identical to the canonical Gemma 3 1B int4 file
+        # (584,417,280 bytes). The file is NOT committed to the repo.
+        run: |
+          mkdir -p app/src/main/assets/models
+          curl -sL -o app/src/main/assets/models/gemma3-1b-it-int4.litertlm "https://huggingface.co/lotapa/gemma3-1b-it-int4.litertlm/resolve/main/gemma3-1b-it-int4.litertlm"
+          echo "1325ae366d31950f137c9c357b9fa89448b176d76998180c08ceaca78bba98be  app/src/main/assets/models/gemma3-1b-it-int4.litertlm" | sha256sum -c -
+          ls -l app/src/main/assets/models/
+
       - name: Build debug APK
         env:
           # Bakes the owner's HF token into the APK so friends can

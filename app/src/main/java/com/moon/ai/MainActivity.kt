@@ -187,6 +187,13 @@ class MainActivity : AppCompatActivity() {
                 downloadProgress.visibility = View.VISIBLE
                 downloadProgress.progress = state.downloadProgress
             }
+            ChatViewModel.ModelStatus.SETTING_UP -> {
+                statusText.text = getString(R.string.status_setting_up, state.downloadProgress)
+                downloadButton.visibility = View.GONE
+                downloadNote.visibility = View.GONE
+                downloadProgress.visibility = View.VISIBLE
+                downloadProgress.progress = state.downloadProgress
+            }
             ChatViewModel.ModelStatus.LOADING -> {
                 statusText.text = getString(R.string.status_loading)
                 downloadButton.visibility = View.GONE
