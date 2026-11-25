@@ -2,5 +2,11 @@
 // Top-level build file. Mirrors the proven Moon-Chat Gradle setup.
 plugins {
     id 'com.android.application' version '8.5.2' apply false
-    id 'org.jetbrains.kotlin.android' version '2.0.21' apply false
+    // Kotlin 2.3.0: litertlm-android 0.10.2 ships Kotlin metadata 2.3.0
+    // and pulls kotlin-stdlib/reflect 2.2.21 (metadata 2.2.0), which the
+    // old 2.0.21 compiler could not read ("binary version of its metadata
+    // is 2.2.0/2.3.0, expected version is 2.0.0"). Per Kotlin's official
+    // compatibility table, KGP 2.3.0 supports AGP 8.2.2-8.13.0 and Gradle
+    // 7.6.3-9.0.0, so it fits this AGP 8.5.2 + Gradle 8.7 setup.
+    id 'org.jetbrains.kotlin.android' version '2.3.0' apply false
 }
