@@ -84,6 +84,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         if (_uiState.value.status == ModelStatus.DOWNLOADING) return
 
         val dir = ModelManager.modelFile(app).parentFile
+        // The models folder does not exist on first launch, and
+        // File.freeSpace returns 0 for a path that does not exist —
+        // that wrongly reported "not enough space" on a phone with
+        // 50 GB free. Create the folder first, then measure.
+        dir?.mkdirs()
         val free = dir?.freeSpace ?: 0L
         if (free < ModelManager.EXPECTED_SIZE_BYTES + 512L * 1024 * 1024) {
             _uiState.update {
