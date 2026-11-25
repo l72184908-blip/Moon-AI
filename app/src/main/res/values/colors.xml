@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Moon AI theme: PURE BLACK (#000000) everywhere, WHITE (#FFFFFF) text.
+  No dark grey surfaces anywhere. Text is always white — the 70% / 50%
+  entries below are the same white with alpha, used only to rank
+  secondary text (timestamps, hints) below primary text. The only
+  accent is white itself (send / download buttons are white-filled
+  with black text).
+-->
+<resources>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white_70">#B3FFFFFF</color>
+    <color name="white_50">#80FFFFFF</color>
+    <color name="white_30">#4DFFFFFF</color>
+    <color name="outline">#33FFFFFF</color>
+</resources>

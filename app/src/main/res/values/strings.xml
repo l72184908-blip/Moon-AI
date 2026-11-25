@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Moon AI</string>
+    <string name="chat_hint">Ask Moon AI…</string>
+    <string name="send">Send</string>
+    <string name="clear_chat">Clear chat</string>
+    <string name="settings">Settings</string>
+    <string name="status_not_downloaded">Model not downloaded</string>
+    <string name="status_downloading">Downloading model… %1$d%%</string>
+    <string name="status_loading">Loading model…</string>
+    <string name="status_ready">Model ready — fully offline</string>
+    <string name="status_error">Something went wrong: %1$s</string>
+    <string name="download">Download model</string>
+    <string name="resume">Resume download</string>
+    <string name="download_note">One-time download, about 3.4 GB. Use WiFi.</string>
+    <string name="need_token">Add your Hugging Face token in Settings first.</string>
+    <string name="wifi_warning">You are not on WiFi. The model is about 3.4 GB — downloading on mobile data may use a lot of data. Continue anyway?</string>
+    <string name="continue_anyway">Continue</string>
+    <string name="cancel">Cancel</string>
+    <string name="thinking">Thinking…</string>
+    <string name="welcome">Hello! I\'m Moon AI — I run fully offline on your phone. No internet, no account, nothing leaves your phone.</string>
+    <string name="model_missing">Download the model first.</string>
+    <string name="delete_model">Delete model</string>
+    <string name="delete_model_confirm">Delete the downloaded model (about 3.4 GB)? You can download it again later.</string>
+    <string name="delete">Delete</string>
+    <string name="model_deleted">Model deleted.</string>
+    <string name="token_saved">Token saved.</string>
+    <string name="show_token">Show token</string>
+    <string name="not_enough_space">Not enough free space. The model needs about 3.9 GB free.</string>
+    <string name="download_failed_auth">Download failed (401). Check your Hugging Face token in Settings — and make sure you accepted the Gemma license on Hugging Face.</string>
+</resources>

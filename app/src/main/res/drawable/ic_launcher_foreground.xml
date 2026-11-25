@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- White crescent moon on pure black (adaptive-icon foreground, 108x108).
+     A white disc with a black disc cut out of its upper-right side. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,18 a36,36 0 1,0 0,72 a36,36 0 1,0 0,-72 Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M70,10 a32,32 0 1,0 0,64 a32,32 0 1,0 0,-64 Z" />
+</vector>

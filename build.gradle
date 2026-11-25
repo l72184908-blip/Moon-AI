@@ -1,0 +1,6 @@
+// Moon AI — your own offline AI app (Gemma 3n E2B, LiteRT-LM)
+// Top-level build file. Mirrors the proven Moon-Chat Gradle setup.
+plugins {
+    id 'com.android.application' version '8.5.2' apply false
+    id 'org.jetbrains.kotlin.android' version '2.0.21' apply false
+}
