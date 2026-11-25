@@ -131,7 +131,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onDownloadClicked() {
-        if (Prefs.getHfToken(this).isNullOrBlank()) {
+        // Accept the built-in token too — checking only the saved
+        // token wrongly blocked the download even though v1.0.2
+        // already falls back to BuildConfig.DEFAULT_HF_TOKEN.
+        val hasToken = !Prefs.getHfToken(this).isNullOrBlank() ||
+            BuildConfig.DEFAULT_HF_TOKEN.isNotBlank()
+        if (!hasToken) {
             Toast.makeText(this, R.string.need_token, Toast.LENGTH_LONG).show()
             settingsLauncher.launch(Intent(this, SettingsActivity::class.java))
             return
