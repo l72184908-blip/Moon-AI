@@ -25,6 +25,11 @@ jobs:
           gradle-version: '8.7'
 
       - name: Build debug APK
+        env:
+          # Bakes the owner's HF token into the APK so friends can
+          # download the model without their own token. The secret is
+          # never printed or committed; it only exists inside the APK.
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: gradle assembleDebug --stacktrace
 
       - name: Upload APK

@@ -100,7 +100,14 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        val token = Prefs.getHfToken(app)
+        // The user's own saved token wins; otherwise fall back to the
+        // token baked into the build (BuildConfig.DEFAULT_HF_TOKEN,
+        // injected from the HF_TOKEN GitHub secret at build time).
+        // NOTE: a baked-in token lives inside the APK, so anyone with
+        // the APK file can extract it — this is only meant for sharing
+        // the app with friends, not for a public release.
+        val token = Prefs.getHfToken(app).takeUnless { it.isNullOrBlank() }
+            ?: BuildConfig.DEFAULT_HF_TOKEN.takeUnless { it.isBlank() }
         _uiState.update {
             it.copy(
                 status = ModelStatus.DOWNLOADING,

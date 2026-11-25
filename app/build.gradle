@@ -11,8 +11,20 @@ android {
         applicationId "com.moon.ai"
         minSdk 26
         targetSdk 34
-        versionCode 2
-        versionName "1.0.1"
+        versionCode 3
+        versionName "1.0.2"
+
+        // Built-in Hugging Face token, injected at build time from the
+        // HF_TOKEN environment variable (GitHub Actions secret). Empty
+        // when the build runs without it — then the user must paste
+        // their own token in Settings. HF tokens only contain letters,
+        // digits and underscore, so plain quoting is safe here.
+        buildConfigField 'String', 'DEFAULT_HF_TOKEN',
+            '"' + (System.getenv('HF_TOKEN') ?: '') + '"'
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
