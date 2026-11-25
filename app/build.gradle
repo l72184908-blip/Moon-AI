@@ -11,8 +11,8 @@ android {
         applicationId "com.moon.ai"
         minSdk 26
         targetSdk 34
-        versionCode 4
-        versionName "1.0.3"
+        versionCode 5
+        versionName "1.0.4"
 
         // Built-in Hugging Face token, injected at build time from the
         // HF_TOKEN environment variable (GitHub Actions secret). Empty
