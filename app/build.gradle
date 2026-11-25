@@ -45,7 +45,10 @@ dependencies {
     implementation 'com.google.android.material:material:1.11.0'
 
     // LiteRT-LM — on-device LLM inference (Gemma 3n E2B, .litertlm).
-    // Google's own docs recommend latest.release; it resolves at build time
-    // on Google Maven. See BUILD_NOTES.md for the versions seen in research.
-    implementation 'com.google.ai.edge.litertlm:litertlm-android:latest.release'
+    // Pinned to 0.10.2 (Apr 2026 stable). latest.release resolved to
+    // 0.20.0, whose classes are Java 25 bytecode (major version 69) that
+    // AGP 8.5.2's R8 cannot dex ("Unsupported class file major version
+    // 69"). If the 0.10.2 API differs from the code, the compile error
+    // will say so — then adapt the LlmEngine calls or try 0.14.0.
+    implementation 'com.google.ai.edge.litertlm:litertlm-android:0.10.2'
 }
